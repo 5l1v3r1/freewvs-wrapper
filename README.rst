@@ -21,7 +21,7 @@ INSTALLATION
 - Clone this repository to any directory and clone freewvs into the
   subdirectory ``freewvs``.
 
-::
+.. code-block:: Bash
 
   mkdir -p /opt/freewvs
   cd /opt/freewvs
@@ -31,6 +31,7 @@ INSTALLATION
 
 - Adjust settings in the file ``settings.py``.
 - Install a cronjob that calls cron.sh with the path to the hostings, e.g.:
+
   ``30 12 * * 6 /opt/freewvs/cron.sh /path/to/hostings >> /var/log/hostingVulnScan 2>&1``
 
 
