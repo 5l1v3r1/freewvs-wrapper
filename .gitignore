@@ -1,0 +1,9 @@
+# .gitignore
+
+*~
+*.pyc
+/freewvs/
+/settings.py
+
+/vulnscan.xml
+/vulnscan_*.csv
