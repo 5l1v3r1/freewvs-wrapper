@@ -16,20 +16,20 @@
 #
 # Please note this script is not trying to win a beauty contest, it was written
 # specifically to deal with the freewvs results.
-import pprint
+
 import csv
 import time
 import os
-import settings
 import sys
 import re
+import settings
 from lxml import etree
 
 
 def parse_script_path(path, split):
     # make sure split keyword ends with a slash or the following split
     # won't make sense
-    if (not split.endswith('/')):
+    if not split.endswith('/'):
         split += '/'
     parts = path.partition(split)
     return parts[2].split('/', 1)
@@ -37,10 +37,10 @@ def parse_script_path(path, split):
 
 def parse_result_xml(in_file, out_file):
     """Parse freewvs result xml into csv"""
-    with open(out_file, 'w') as f:
+    with open(out_file, 'w') as fds:
         header = (
             'appname', 'version', 'hosting', 'path', 'safeversion', 'vulninfo')
-        writer = csv.writer(f)
+        writer = csv.writer(fds)
         writer.writerow(header)
         root = etree.parse(in_file)
         for app in root.iter('app'):
@@ -49,7 +49,7 @@ def parse_result_xml(in_file, out_file):
             hosting, path = parse_script_path(
                 app.find('directory').text,
                 settings.HOSTING_DIR
-                )
+            )
 
             appname = app.find('appname').text
             version = app.find('version').text
@@ -72,9 +72,13 @@ def email_results(recipients, attachments, text_addon):
     import socket
 
     # scan results from <datetime> on <hostname>
-    text = ("Web vulnerability scan results from %s on %s."
-    % (time.strftime('%d.%m.%Y %H:%M'), socket.gethostname()))
-    if (text_addon):
+    text = (
+        "Web vulnerability scan results from %s on %s." % (
+            time.strftime('%d.%m.%Y %H:%M'),
+            socket.gethostname()
+        )
+    )
+    if text_addon:
         text += '\n\n' + text_addon
     text += '\n\nPowered by freewvs and Adfinis SyGroup AG.'
     text += '\nhttps://wiki.adfinis-sygroup.ch/adsy/index.php/Freewvs'
@@ -86,18 +90,20 @@ def email_results(recipients, attachments, text_addon):
     msg['To'] = ', '.join(recipients)
     msg.attach(MIMEText(text))
 
-    for f in attachments:
+    for fds in attachments:
         part = MIMEBase('application', 'octet-stream')
-        part.set_payload(open(f, 'rb').read())
+        part.set_payload(open(fds, 'rb').read())
         Encoders.encode_base64(part)
-        part.add_header('Content-Disposition', 'attachment; filename="%s"'
-            % os.path.basename(f))
+        part.add_header(
+            'Content-Disposition',
+            'attachment; filename="%s"' % os.path.basename(fds)
+        )
         msg.attach(part)
 
     # send mail
     smtp = SMTP(settings.SMTP_HOST, settings.SMTP_PORT)
     smtp.starttls()
-    if (settings.SMTP_PASS):
+    if settings.SMTP_PASS:
         smtp.login(settings.SMTP_USER, settings.SMTP_PASS)
     smtp.sendmail(msg['From'], recipients, msg.as_string())
     smtp.quit()
@@ -112,13 +118,16 @@ try:
     db_version = match.groups()[0]
 
     # there was an update
-    if (update_output.lower().find('updated') >= 0):
-        update_msg = 'freewvsdb was automatically updated to revision %s' % db_version
+    if update_output.lower().find('updated') >= 0:
+        update_msg = 'freewvsdb was automatically updated to revision %s' % (
+            db_version
+        )
     # no update
     else:
         update_msg = 'freewvsdb is up-to-date at revision %s' % db_version
 except:
-    update_msg = 'Notice: freewvsdb updater is not working. This should be fixed!'
+    update_msg = 'Notice: freewvsdb updater is not working. ' \
+                 'This should be fixed!'
 
 
 # parse freewvs xml to csv
@@ -132,10 +141,13 @@ email_results(
 )
 
 # log some infos
-print("\n[%s] Vulnerability scan complete. Sent email." % time.strftime('%Y-%m-%d-%H:%M'))
+print(
+    "\n[%s] Vulnerability scan complete. Sent email." %
+    time.strftime('%Y-%m-%d-%H:%M')
+)
 print("Purged generated file %s" % settings.OUT_FILE)
 print(update_msg)
 print('Output from `svn update freewvsdb`:')
 print(update_output)
-os.remove(settings.OUT_FILE)
 
+os.remove(settings.OUT_FILE)
