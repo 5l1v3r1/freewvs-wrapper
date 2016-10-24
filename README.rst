@@ -35,6 +35,43 @@ INSTALLATION
   ``30 12 * * 6 /opt/freewvs/cron.sh /path/to/hostings >> /var/log/hostingVulnScan 2>&1``
 
 
+EXTENSION
+=========
+This tool is an addon to freewvs to adjust settings and generate a
+csv-report. The sourcecode is written in python and does not modify the
+original freewvs code.
+
+Update
+~~~~~~
+The internal database is a set of ini-files with informations about scripts
+and versions. The database is located in the directory ``freewvsdb``.
+This directory will be automatically updated from schokokeks before the
+cronjob starts the scan.
+
+processResults.py
+~~~~~~~~~~~~~~~~~
+- This script parse the XML and generates an CSV report.
+- Generates an e-mail with the CSV report.
+- Send the e-mail to the referred persons.
+
+settings.py
+~~~~~~~~~~~
+This file contains the configuration for ``processResults.py``.
+
+
+DEBUGGING
+=========
+``Notice: freewvsdb updater is not working. This should be fixed!``
+This means that the internal database is not proper updated.
+The sequence is the following:
+
+- ``cron.sh`` updates the ``freewvsdb`` directory with ``svn co``.
+- scanning for vulnerability
+- ``processResult.py`` will be started with the output of svn checkout as
+  argument.
+- check if an update is made and search for the database revision.
+
+
 LICENSE
 =======
 Freewvs was developed by the german hosting provider Schokokeks and is open
