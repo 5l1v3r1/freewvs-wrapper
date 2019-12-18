@@ -2,6 +2,8 @@
 Freewvs Wrapper
 ===============
 
+WARNING: This project is deprecated and should not be used anymore. It is not maintained!
+
 |License|
 
 .. |License| image:: https://img.shields.io/github/license/adfinis-sygroup/freewvs-wrapper.svg?style=flat-square 
